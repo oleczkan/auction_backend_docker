@@ -1,0 +1,42 @@
+version: "3.0"
+services:
+
+  database:
+    container_name: app-db
+    image: mysql:8.0.33
+    ports:
+      - "3309:3306"
+    networks:
+      - app-net
+    volumes:
+      - app-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USERNAME: root
+      MYSQL_DATABASE: app
+
+  api:
+    container_name: app-api
+    image: oleczkan/app-api:1.0
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - app-net
+    restart: always
+    depends_on:
+      - database
+    environment:
+      MYSQL_HOST: app-db
+      MYSQL_PASSWORD: root
+      MYSQL_USERNAME: root
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: app
+
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  app-data:
